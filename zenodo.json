@@ -1,0 +1,39 @@
+{
+  "title": "Separately Trained Senses Converge on Shared Latent Structure: An Empirical Check of Identifiability Predictions Without Shared Data",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "<p>Identifiability theory for contrastive learning predicts that an encoder trained with suitable positive pairs recovers the latent structure behind its inputs, so separately trained networks that perceive a common world should converge on its shared structure without shared training data. This is one proposed explanation for the Platonic Representation Hypothesis, whose evidence comes mostly from models trained on overlapping human-generated data. We check the prediction in a small synthetic world: an \"eye\" (rendered images) and an \"ear\" (rendered sounds) each perceive eight latent properties of every object, a controlled number of them shared, and each network is trained alone, without labels, on its own objects. Over three seeds, with permutation-calibrated mutual nearest-neighbor alignment, the learners stay at the null level when they share nothing and converge monotonically as the shared fraction grows; from half overlap upward, each learner's features also move toward the true shared properties. Among four learning rules, strong convergence occurred only with the one that approximates the theory's assumptions, contrastive learning between glimpses of an object that drifts between them, and peaked at an intermediate drift; the sound learner, which does not improve at all without drift, discriminates the rules most clearly. With the present learners, the convergence is too weak for unpaired Gromov–Wasserstein matching to recover which image goes with which sound. Partially shared perception also makes fine-grained alignment fall as evaluation sets grow while coarse alignment holds, as recently reported for language and vision models, suggesting a way to reconcile that finding with convergence on shared structure. A calibrated check with Pythia and DINOv2 reproduces the reported language–vision size trend at small scale. The study is confirmatory and small: it shows that a shared world can produce convergence without shared data, and makes no claim about how much of the convergence between web-trained models this explains.</p><p>The archive contains the paper (paper/senses_converge.pdf), LaTeX source, all code, raw results for every run (three seeds per configuration), and an interactive project page (index.html). Code is MIT-licensed; paper, figures and data are CC BY 4.0.</p>",
+  "creators": [
+    {
+      "name": "Bussing, Jonathan",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "license": "cc-by-4.0",
+  "access_right": "open",
+  "version": "1.0.0",
+  "language": "eng",
+  "keywords": [
+    "representational convergence",
+    "Platonic Representation Hypothesis",
+    "identifiability",
+    "contrastive learning",
+    "self-supervised learning",
+    "representation alignment",
+    "mutual nearest neighbors",
+    "multimodal learning",
+    "Gromov-Wasserstein"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/jbussin/senses-converge",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://jbussin.github.io/senses-converge/",
+      "relation": "isDocumentedBy",
+      "resource_type": "other"
+    }
+  ]
+}
