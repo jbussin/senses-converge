@@ -1,0 +1,22 @@
+text_model,text_params_M,vision_model,vision_params_M,alignment,alignment_sd,shuffled,margin,best_text_layer,best_vision_layer
+pythia-410m UNTRAINED,354,facebook/dinov2-small,22,0.0341,0.0021,0.0132,0.0209,0,12
+pythia-410m UNTRAINED,354,facebook/dinov2-base,87,0.0333,0.002,0.0121,0.0212,0,12
+pythia-410m UNTRAINED,354,facebook/dinov2-large,304,0.0348,0.0018,0.0111,0.0236,0,23
+pythia-70m,45,facebook/dinov2-small,22,0.0509,0.0023,0.0116,0.0393,6,12
+pythia-70m,45,facebook/dinov2-base,87,0.0509,0.0022,0.0125,0.0384,6,12
+pythia-70m,45,facebook/dinov2-large,304,0.0497,0.0022,0.0125,0.0372,6,23
+pythia-160m,124,facebook/dinov2-small,22,0.0563,0.0023,0.0123,0.044,12,12
+pythia-160m,124,facebook/dinov2-base,87,0.0568,0.0024,0.0122,0.0446,12,12
+pythia-160m,124,facebook/dinov2-large,304,0.0577,0.0025,0.0121,0.0456,12,23
+pythia-410m,354,facebook/dinov2-small,22,0.064,0.0024,0.0127,0.0513,24,12
+pythia-410m,354,facebook/dinov2-base,87,0.0655,0.0028,0.0115,0.054,24,12
+pythia-410m,354,facebook/dinov2-large,304,0.0705,0.0023,0.0117,0.0588,24,23
+pythia-1b,909,facebook/dinov2-small,22,0.074,0.0026,0.0127,0.0613,16,12
+pythia-1b,909,facebook/dinov2-base,87,0.0752,0.003,0.0118,0.0634,16,12
+pythia-1b,909,facebook/dinov2-large,304,0.0787,0.0024,0.0126,0.0661,16,23
+pythia-1.4b,1312,facebook/dinov2-small,22,0.0734,0.002,0.0117,0.0617,23,12
+pythia-1.4b,1312,facebook/dinov2-base,87,0.0758,0.0023,0.0118,0.064,22,12
+pythia-1.4b,1312,facebook/dinov2-large,304,0.0772,0.0024,0.0116,0.0656,24,23
+pythia-2.8b,2646,facebook/dinov2-small,22,0.0857,0.0025,0.0125,0.0732,31,12
+pythia-2.8b,2646,facebook/dinov2-base,87,0.0861,0.0026,0.0125,0.0736,31,12
+pythia-2.8b,2646,facebook/dinov2-large,304,0.0914,0.0024,0.0121,0.0793,31,23

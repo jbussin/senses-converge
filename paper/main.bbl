@@ -1,0 +1,196 @@
+\begin{thebibliography}{26}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Andreas et~al.(2022)Andreas, Begu{\v{s}}, Bronstein,
+  et~al.]{andreas2022whales}
+Jacob Andreas, Ga{\v{s}}per Begu{\v{s}}, Michael~M. Bronstein, et~al.
+\newblock Toward understanding the communication in sperm whales.
+\newblock \emph{iScience}, 25\penalty0 (6):\penalty0 104393, 2022.
+
+\bibitem[Biderman et~al.(2023)Biderman, Schoelkopf, Anthony, Bradley, O'Brien,
+  Hallahan, Khan, Purohit, Prashanth, Raff, Skowron, Sutawika, and van~der
+  Wal]{biderman2023pythia}
+Stella Biderman, Hailey Schoelkopf, Quentin Anthony, Herbie Bradley, Kyle
+  O'Brien, Eric Hallahan, Mohammad~Aflah Khan, Shivanshu Purohit, USVSN~Sai
+  Prashanth, Edward Raff, Aviya Skowron, Lintang Sutawika, and Oskar van~der
+  Wal.
+\newblock Pythia: A suite for analyzing large language models across training
+  and scaling.
+\newblock In \emph{Proceedings of the 40th International Conference on Machine
+  Learning (ICML)}, 2023.
+\newblock arXiv:2304.01373.
+
+\bibitem[Chen et~al.(2020)Chen, Kornblith, Norouzi, and Hinton]{chen2020simclr}
+Ting Chen, Simon Kornblith, Mohammad Norouzi, and Geoffrey Hinton.
+\newblock A simple framework for contrastive learning of visual
+  representations.
+\newblock In \emph{Proceedings of the 37th International Conference on Machine
+  Learning (ICML)}, 2020.
+
+\bibitem[Conneau et~al.(2018)Conneau, Lample, Ranzato, Denoyer, and
+  J{\'e}gou]{conneau2018word}
+Alexis Conneau, Guillaume Lample, Marc'Aurelio Ranzato, Ludovic Denoyer, and
+  Herv{\'e} J{\'e}gou.
+\newblock Word translation without parallel data.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2018.
+
+\bibitem[Daunhawer et~al.(2023)Daunhawer, Bizeul, Palumbo, Marx, and
+  Vogt]{daunhawer2023identifiability}
+Imant Daunhawer, Alice Bizeul, Emanuele Palumbo, Alexander Marx, and Julia~E.
+  Vogt.
+\newblock Identifiability results for multimodal contrastive learning.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2023.
+
+\bibitem[Gr{\"o}ger et~al.(2026)Gr{\"o}ger, Wen, and
+  Brbi{\'c}]{groger2026aristotelian}
+Fabian Gr{\"o}ger, Shuo Wen, and Maria Brbi{\'c}.
+\newblock Revisiting the {Platonic} representation hypothesis: An
+  {Aristotelian} view.
+\newblock In \emph{Proceedings of the 43rd International Conference on Machine
+  Learning (ICML)}, 2026.
+\newblock arXiv:2602.14486.
+
+\bibitem[Huh et~al.(2024)Huh, Cheung, Wang, and Isola]{huh2024platonic}
+Minyoung Huh, Brian Cheung, Tongzhou Wang, and Phillip Isola.
+\newblock The platonic representation hypothesis.
+\newblock In \emph{Proceedings of the 41st International Conference on Machine
+  Learning (ICML)}, 2024.
+\newblock arXiv:2405.07987.
+
+\bibitem[Jha et~al.(2025)Jha, Zhang, Shmatikov, and Morris]{jha2025vec2vec}
+Rishi Jha, Collin Zhang, Vitaly Shmatikov, and John~X. Morris.
+\newblock Harnessing the universal geometry of embeddings.
+\newblock \emph{arXiv preprint arXiv:2505.12540}, 2025.
+
+\bibitem[Koepke et~al.(2026)Koepke, Zverev, Ginosar, and Efros]{koepke2026cave}
+A.~Sophia Koepke, Daniil Zverev, Shiry Ginosar, and Alexei~A. Efros.
+\newblock Back into {Plato's} cave: Examining cross-modal representational
+  convergence at scale.
+\newblock \emph{arXiv preprint arXiv:2604.18572}, 2026.
+
+\bibitem[Kriegeskorte et~al.(2008{\natexlab{a}})Kriegeskorte, Mur, and
+  Bandettini]{kriegeskorte2008rsa}
+Nikolaus Kriegeskorte, Marieke Mur, and Peter Bandettini.
+\newblock Representational similarity analysis -- connecting the branches of
+  systems neuroscience.
+\newblock \emph{Frontiers in Systems Neuroscience}, 2:\penalty0 4,
+  2008{\natexlab{a}}.
+
+\bibitem[Kriegeskorte et~al.(2008{\natexlab{b}})Kriegeskorte, Mur, Ruff, Kiani,
+  Bodurka, Esteky, Tanaka, and Bandettini]{kriegeskorte2008matching}
+Nikolaus Kriegeskorte, Marieke Mur, Douglas~A. Ruff, Roozbeh Kiani, Jerzy
+  Bodurka, Hossein Esteky, Keiji Tanaka, and Peter~A. Bandettini.
+\newblock Matching categorical object representations in inferior temporal
+  cortex of man and monkey.
+\newblock \emph{Neuron}, 60\penalty0 (6):\penalty0 1126--1141,
+  2008{\natexlab{b}}.
+
+\bibitem[Li et~al.(2026)Li, Ma, Xiong, Chen, and Zhang]{li2026worldmodels}
+Wenhow Li, Chengwei Ma, Hui Xiong, Ying-Cong Chen, and Lei Zhang.
+\newblock {Platonic} representation hypothesis on world models.
+\newblock \emph{arXiv preprint arXiv:2608.23720}, 2026.
+
+\bibitem[Moschella et~al.(2023)Moschella, Maiorca, Fumero, Norelli, Locatello,
+  and Rodol{\`a}]{moschella2023relative}
+Luca Moschella, Valentino Maiorca, Marco Fumero, Antonio Norelli, Francesco
+  Locatello, and Emanuele Rodol{\`a}.
+\newblock Relative representations enable zero-shot latent space communication.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2023.
+
+\bibitem[Nagel(1974)]{nagel1974bat}
+Thomas Nagel.
+\newblock What is it like to be a bat?
+\newblock \emph{The Philosophical Review}, 83\penalty0 (4):\penalty0 435--450,
+  1974.
+
+\bibitem[Oquab et~al.(2024)Oquab, Darcet, Moutakanni, Vo, Szafraniec,
+  et~al.]{oquab2023dinov2}
+Maxime Oquab, Timoth{\'e}e Darcet, Th{\'e}o Moutakanni, Huy Vo, Marc
+  Szafraniec, et~al.
+\newblock {DINOv2}: Learning robust visual features without supervision.
+\newblock \emph{Transactions on Machine Learning Research}, 2024.
+\newblock arXiv:2304.07193.
+
+\bibitem[Park(2026)]{park2026convergent}
+Core~Francisco Park.
+\newblock Convergent world representations and divergent tasks.
+\newblock \emph{arXiv preprint arXiv:2602.00533}, 2026.
+
+\bibitem[Peyr{\'e} et~al.(2016)Peyr{\'e}, Cuturi, and Solomon]{peyre2016gromov}
+Gabriel Peyr{\'e}, Marco Cuturi, and Justin Solomon.
+\newblock Gromov-{W}asserstein averaging of kernel and distance matrices.
+\newblock In \emph{Proceedings of the 33rd International Conference on Machine
+  Learning (ICML)}, 2016.
+
+\bibitem[Radovanovi{\'c} et~al.(2010)Radovanovi{\'c}, Nanopoulos, and
+  Ivanovi{\'c}]{radovanovic2010hubs}
+Milo{\v{s}} Radovanovi{\'c}, Alexandros Nanopoulos, and Mirjana Ivanovi{\'c}.
+\newblock Hubs in space: Popular nearest neighbors in high-dimensional data.
+\newblock \emph{Journal of Machine Learning Research}, 11:\penalty0 2487--2531,
+  2010.
+
+\bibitem[Srinivasan et~al.(2021)Srinivasan, Raman, Chen, Bendersky, and
+  Najork]{srinivasan2021wit}
+Krishna Srinivasan, Karthik Raman, Jiecao Chen, Michael Bendersky, and Marc
+  Najork.
+\newblock {WIT}: Wikipedia-based image text dataset for multimodal multilingual
+  machine learning.
+\newblock In \emph{Proceedings of the 44th International ACM SIGIR Conference
+  on Research and Development in Information Retrieval}, 2021.
+
+\bibitem[Tian et~al.(2020)Tian, Sun, Poole, Krishnan, Schmid, and
+  Isola]{tian2020views}
+Yonglong Tian, Chen Sun, Ben Poole, Dilip Krishnan, Cordelia Schmid, and
+  Phillip Isola.
+\newblock What makes for good views for contrastive learning?
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2020.
+
+\bibitem[Tjandrasuwita et~al.(2025)Tjandrasuwita, Ekbote, Ziyin, and
+  Liang]{tjandrasuwita2025emergence}
+Megan Tjandrasuwita, Chanakya Ekbote, Liu Ziyin, and Paul~Pu Liang.
+\newblock Understanding the emergence of multimodal representation alignment.
+\newblock In \emph{Proceedings of the 42nd International Conference on Machine
+  Learning (ICML)}, volume 267 of \emph{PMLR}, pages 59723--59760, 2025.
+
+\bibitem[von K{\"u}gelgen et~al.(2021)von K{\"u}gelgen, Sharma, Gresele,
+  Brendel, Sch{\"o}lkopf, Besserve, and Locatello]{vonkugelgen2021self}
+Julius von K{\"u}gelgen, Yash Sharma, Luigi Gresele, Wieland Brendel, Bernhard
+  Sch{\"o}lkopf, Michel Besserve, and Francesco Locatello.
+\newblock Self-supervised learning with data augmentations provably isolates
+  content from style.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2021.
+
+\bibitem[Wiskott and Sejnowski(2002)]{wiskott2002slow}
+Laurenz Wiskott and Terrence~J. Sejnowski.
+\newblock Slow feature analysis: Unsupervised learning of invariances.
+\newblock \emph{Neural Computation}, 14\penalty0 (4):\penalty0 715--770, 2002.
+
+\bibitem[Yamins and DiCarlo(2016)]{yamins2016goal}
+Daniel L.~K. Yamins and James~J. DiCarlo.
+\newblock Using goal-driven deep learning models to understand sensory cortex.
+\newblock \emph{Nature Neuroscience}, 19\penalty0 (3):\penalty0 356--365, 2016.
+
+\bibitem[You et~al.(2026)You, Jang, Mo, and Jung]{you2026structure}
+Junwon You, Mihyun Jang, Sangwoo Mo, and Jae-Hun Jung.
+\newblock What converges in the {Platonic} representation hypothesis? structure
+  over geometry.
+\newblock \emph{arXiv preprint arXiv:2609.27252}, 2026.
+
+\bibitem[Zimmermann et~al.(2021)Zimmermann, Sharma, Schneider, Bethge, and
+  Brendel]{zimmermann2021contrastive}
+Roland~S. Zimmermann, Yash Sharma, Steffen Schneider, Matthias Bethge, and
+  Wieland Brendel.
+\newblock Contrastive learning inverts the data generating process.
+\newblock In \emph{Proceedings of the 38th International Conference on Machine
+  Learning (ICML)}, 2021.
+
+\end{thebibliography}
