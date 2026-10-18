@@ -6,8 +6,11 @@ authors:
   - family-names: Bussing
     given-names: Jonathan
     email: jbussing@ucsd.edu
-version: "1.0.0"
-date-released: 2026-09-30
+version: "1.0.1"
+date-released: 2026-10-18
+doi: 10.5281/zenodo.23445191
+repository-code: "https://github.com/jbussin/senses-converge"
+url: "https://jbussin.github.io/senses-converge/"
 license: MIT
 keywords:
   - representational convergence
@@ -24,4 +27,5 @@ preferred-citation:
   year: 2026
   publisher:
     name: Zenodo
-  notes: "Preprint, version 1"
+  doi: 10.5281/zenodo.23445191
+  notes: "Preprint"

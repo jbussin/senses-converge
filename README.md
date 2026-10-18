@@ -1,13 +1,15 @@
 # Separately Trained Senses Converge on Shared Latent Structure
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23445191.svg)](https://doi.org/10.5281/zenodo.23445191)
+
 **An Empirical Check of Identifiability Predictions Without Shared Data**
 Jonathan Bussing · Independent researcher · jbussing@ucsd.edu
 
 Two networks, an "eye" trained on rendered images and an "ear" trained on rendered sounds, are trained alone, without labels, on disjoint objects from a synthetic world. They converge on the part of the world they both perceive, and each moves toward the world's true latent structure. That happens only under the learning rule that approximates the assumptions of identifiability theory: contrastive learning between glimpses of an object that drifts between them.
 
 - Paper: [`paper/senses_converge.pdf`](paper/senses_converge.pdf)
-- Interactive summary: `index.html` (served with GitHub Pages)
-- Preprint record and DOI: Zenodo (link added on release)
+- Preprint record: [doi:10.5281/zenodo.23445191](https://doi.org/10.5281/zenodo.23445191)
+- Project page: https://jbussin.github.io/senses-converge/
 
 ## Contents
 
@@ -58,7 +60,19 @@ All experiments ran on one NVIDIA RTX 4070 Ti (12 GB). A synthetic configuration
 
 ## Citation
 
-See `CITATION.cff`. The DOI will be added when the Zenodo record is published.
+```
+@misc{bussing2026senses,
+  title     = {Separately Trained Senses Converge on Shared Latent Structure:
+               An Empirical Check of Identifiability Predictions Without Shared Data},
+  author    = {Bussing, Jonathan},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.23445191},
+  url       = {https://doi.org/10.5281/zenodo.23445191},
+  note      = {Preprint}
+}
+```
+Also see `CITATION.cff`.
 
 ## License
 
