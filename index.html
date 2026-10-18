@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Separately Trained Senses</title>
+<meta name="description" content="Two networks, an eye and an ear, trained alone on disjoint data, converge on the part of a synthetic world they both perceive. Interactive results from the preprint.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one 760px reading column; each result is a framed figure with its controls, text between them. Eye and ear are the two identity colors; overlap levels use one violet ramp. */
+:root{
+  --ground:#F4F5F7; --surface:#FFFFFF; --ink:#16171D; --muted:#5A5E6B; --faint:#8C909B; --rule:#DDDFE5; --chip:#ECEDF2;
+  --eye:#3D52D5; --ear:#0B8A6F; --null:#9A9DA8; --band:rgba(61,82,213,.08);
+  --s4:#A19DDB; --s6:#6D68BF; --s7:#47429C; --s8:#221E5C;
+  --good:#1F7A4D; --good-soft:rgba(31,122,77,.12); --mixed-soft:rgba(61,82,213,.10); --miss:#A34A2A; --miss-soft:rgba(163,74,42,.10);
+  --serif:"Spectral", Georgia, "Times New Roman", serif;
+  --sans:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0F1117; --surface:#151922; --ink:#E7E8EE; --muted:#9CA0AD; --faint:#6E7280; --rule:#272B36; --chip:#1D212B;
+    --eye:#7485EE; --ear:#23A585; --null:#6E7280; --band:rgba(116,133,238,.10);
+    --s4:#4E4A8E; --s6:#7D78D0; --s7:#A6A2EE; --s8:#D6D4FF;
+    --good:#4FC48A; --good-soft:rgba(79,196,138,.14); --mixed-soft:rgba(116,133,238,.16); --miss:#E08B66; --miss-soft:rgba(224,139,102,.14);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0F1117; --surface:#151922; --ink:#E7E8EE; --muted:#9CA0AD; --faint:#6E7280; --rule:#272B36; --chip:#1D212B;
+  --eye:#7485EE; --ear:#23A585; --null:#6E7280; --band:rgba(116,133,238,.10);
+  --s4:#4E4A8E; --s6:#7D78D0; --s7:#A6A2EE; --s8:#D6D4FF;
+  --good:#4FC48A; --good-soft:rgba(79,196,138,.14); --mixed-soft:rgba(116,133,238,.16); --miss:#E08B66; --miss-soft:rgba(224,139,102,.14);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;padding-inline:18px;padding-block:0}
+.wrap{max-width:760px;margin:0 auto;padding-block:56px 80px;display:flex;flex-direction:column;gap:60px}
+h1,h2,h3{font-family:var(--serif);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2.3rem,6.4vw,3.6rem);font-weight:700;letter-spacing:-.015em}
+h2{font-size:1.6rem;font-weight:600}
+h3{font-size:1.12rem;font-weight:600}
+p{margin:0;max-width:66ch}
+a{color:var(--eye)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--eye);outline-offset:2px}
+em.eye{font-style:normal;color:var(--eye);font-weight:600}
+em.ear{font-style:normal;color:var(--ear);font-weight:600}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hero{display:flex;flex-direction:column;gap:18px}
+.subtitle{font-family:var(--serif);font-size:1.28rem;line-height:1.35;color:var(--muted);max-width:44ch}
+.byline{font-size:.95rem;color:var(--muted)}
+.byline strong{color:var(--ink);font-weight:600}
+.buttons{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:500 .9rem var(--sans);padding:9px 16px;border-radius:999px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);text-decoration:none;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn[aria-disabled="true"]{color:var(--faint);cursor:default;border-style:dashed}
+.btn[aria-disabled="true"]:hover{border-color:var(--rule)}
+section{display:flex;flex-direction:column;gap:16px}
+.figure{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.figure svg{width:100%;height:auto;display:block}
+.caption{font-size:.85rem;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;padding:3px;background:var(--chip);flex-wrap:wrap}
+.seg button{font:500 .82rem var(--sans);border:0;background:transparent;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.seg .lab{font:500 .72rem var(--mono);color:var(--muted);padding:6px 8px 6px 10px;letter-spacing:.04em;text-transform:uppercase}
+.readout{font-family:var(--mono);font-size:.84rem;color:var(--ink);font-variant-numeric:tabular-nums;min-height:1.6em}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stats div{display:flex;flex-direction:column;border-top:2px solid var(--ink);padding-top:8px;min-width:0}
+.stats b{font-family:var(--serif);font-size:1.55rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stats span{font-size:.8rem;color:var(--muted)}
+.stats .eyeb{border-top-color:var(--eye)} .stats .earb{border-top-color:var(--ear)}
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px}
+.finding{display:flex;flex-direction:column;gap:6px;border-top:2px solid var(--ink);padding-top:12px;min-width:0}
+.finding .num{font-family:var(--serif);font-size:2.1rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.finding p{font-size:.92rem;color:var(--muted)}
+.law{font-family:var(--serif);font-size:clamp(1rem,2.8vw,1.25rem);background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 20px;overflow-x:auto;white-space:nowrap}
+.law small{display:block;font:400 .82rem var(--sans);color:var(--muted);white-space:normal;margin-top:4px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px 24px;margin:0;padding:0;list-style:none}
+.rules li{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rules code{font-family:var(--mono);font-size:.84rem;font-weight:500}
+.rules span{font-size:.9rem;color:var(--muted)}
+.preds{display:flex;flex-direction:column;gap:22px}
+.pgroup{display:flex;flex-direction:column;gap:10px}
+.pgroup h3{font-size:1rem}
+.pred{display:grid;grid-template-columns:42px 1fr auto;gap:4px 12px;align-items:baseline;padding-block:8px;border-top:1px solid var(--rule)}
+.pred .id{font-family:var(--mono);font-size:.82rem;color:var(--eye);font-weight:500}
+.pred p{font-size:.93rem}
+.verdict{font:600 .76rem var(--sans);padding:3px 10px;border-radius:999px;white-space:nowrap;background:var(--chip);color:var(--ink)}
+.verdict[data-tone="good"]{background:var(--good-soft);color:var(--good)}
+.verdict[data-tone="mixed"]{background:var(--mixed-soft)}
+.verdict[data-tone="miss"]{background:var(--miss-soft);color:var(--miss)}
+@media (max-width:560px){ .pred{grid-template-columns:34px 1fr} .pred .verdict{grid-column:2;justify-self:start} }
+.note{font-size:.9rem;color:var(--muted);border-left:2px solid var(--rule);padding-left:14px}
+.files{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 20px;overflow-x:auto;margin:0;line-height:1.7;white-space:pre}
+.cite pre{font-family:var(--mono);font-size:.8rem;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 20px;overflow-x:auto;margin:0;white-space:pre}
+.cite .btn{position:absolute;top:10px;right:10px;padding:5px 12px;font-size:.8rem}
+footer{font-size:.82rem;color:var(--faint);border-top:1px solid var(--rule);padding-top:20px}
+svg text{font-family:var(--sans)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font:500 .78rem var(--mono);padding:6px 9px;border-radius:6px;white-space:nowrap;z-index:10;font-variant-numeric:tabular-nums}
+@media (max-width:520px){ .figure{padding:14px} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="eyebrow">Preprint · v1 · September 2026</span>
+  <h1>Separately Trained Senses Converge</h1>
+  <p class="subtitle">on shared latent structure: an empirical check of identifiability predictions without shared data</p>
+  <p class="byline"><strong>Jonathan Bussing</strong> · Independent researcher · <span>jbussing@ucsd.edu</span></p>
+  <div class="buttons">
+    <a class="btn" href="paper/senses_converge.pdf">Paper (PDF)</a>
+    <span class="btn" aria-disabled="true" title="Link added once the Zenodo record is published">Zenodo · DOI pending</span>
+    <a class="btn" href="#reproduce">Code &amp; data</a>
+    <a class="btn" href="#rules">Results</a>
+    <a class="btn" href="#predictions">Predictions</a>
+    <a class="btn" href="#citation">Cite</a>
+  </div>
+</header>
+
+<section aria-labelledby="overlap-title">
+  <div class="figure">
+    <h2 id="overlap-title" style="font-size:1.25rem">Two learners that never share data agree in proportion to the world they both perceive</h2>
+    <svg id="props" viewBox="0 0 720 150" role="img" aria-label="The eight latent properties each sense perceives, with the shared ones linked"></svg>
+    <div class="controls">
+      <div class="seg" id="s-seg" role="group" aria-label="Shared properties"><span class="lab">Shared</span></div>
+    </div>
+    <div class="stats">
+      <div><b id="o-m"></b><span>eye↔ear alignment, calibrated (0 = chance)</span></div>
+      <div><b id="o-perf"></b><span>raw alignment: trained pair vs perfect learners</span></div>
+      <div class="eyeb"><b id="o-eye"></b><span>eye↔truth, untrained → trained</span></div>
+      <div class="earb"><b id="o-ear"></b><span>ear↔truth, untrained → trained</span></div>
+    </div>
+    <svg id="curve" viewBox="0 0 720 250" role="img" aria-label="Calibrated eye-ear alignment during training for each overlap level"></svg>
+    <p class="caption">An <em class="eye">eye</em> (rendered images) and an <em class="ear">ear</em> (rendered sounds) each perceive 8 latent properties of every object; some are shared, the rest private to each sense. Each network is trained alone on its own objects. Alignment is mutual 10-nearest-neighbor agreement on 1,024 new objects, calibrated against a 20-permutation null. Three seeds, contrastive learning with drift (σ = 0.05). Truth columns compare each learner with the true shared properties, which only a constructed world can provide.</p>
+  </div>
+</section>
+
+<section aria-labelledby="tldr">
+  <span class="eyebrow" id="tldr">Main findings</span>
+  <div class="findings">
+    <div class="finding"><span class="num">−0.001</span><h3>alignment when nothing is shared</h3><p>With no shared properties both learners stay at the permutation null in every seed (calibrated −0.001 ± 0.001).</p></div>
+    <div class="finding"><span class="num">≈3×</span><h3>convergence with drift</h3><p>Only the rule whose object drifts between glimpses converges strongly: 0.080 against 0.028 for the three rules without drift.</p></div>
+    <div class="finding"><span class="num">+47%</span><h3>at the best drift</h3><p>Convergence peaks at σ = 0.2. Choosing that drift did more than tripling training time.</p></div>
+    <div class="finding"><span class="num">Chance</span><h3>unpaired matching</h3><p>The agreement is real but weak. Matching without pairs needs paired alignment near 0.45; the best learners reach 0.12.</p></div>
+  </div>
+</section>
+
+<section aria-labelledby="setup">
+  <h2 id="setup">What is being tested</h2>
+  <p>Identifiability theory says that contrastive learning with local positive pairs recovers the latent structure behind its inputs, up to a simple transformation. If that holds for real networks, two learners that perceive the same world should converge on its shared structure even when they share no training data. That is one proposed explanation for the Platonic Representation Hypothesis, whose evidence comes mostly from models trained on overlapping human data. A constructed world separates the two explanations.</p>
+  <div class="law">z<sup>eye</sup> = (s, p<sup>eye</sup>) &nbsp;·&nbsp; z<sup>ear</sup> = (s, p<sup>ear</sup>) &nbsp;·&nbsp; s ∈ [0,1]<sup>S</sup> shared, p private, S of 8<small>Each sense renders its latent vector through a fixed random network, then adds per-glimpse nuisance (shift, brightness, onset, phase, noise). No learner ever sees a latent coordinate, the other modality, or a cross-modal pair.</small></div>
+  <ul class="rules">
+    <li><code>recon</code><span>Denoising reconstruction. No identifiability guarantee.</span></li>
+    <li><code>contrast_fixed</code><span>Two glimpses of the same object from a fixed set of 6,000.</span></li>
+    <li><code>contrast_fresh</code><span>The same, with fresh objects every step.</span></li>
+    <li><code>contrast_drift</code><span>The object drifts by σ between glimpses. Meets the theory's assumptions.</span></li>
+  </ul>
+</section>
+
+<section aria-labelledby="rules">
+  <h2 id="rules">The learning rule decides whether convergence happens</h2>
+  <p>At full overlap, the three rules without drift end in the same place. The truth columns show why: the <em class="eye">eye</em> moves toward the true structure under every rule, but the <em class="ear">ear</em> moves only with drift. Cross-model agreement needs both.</p>
+  <div class="figure">
+    <svg id="rulefig" viewBox="0 0 720 300" role="img" aria-label="Each learner's alignment with the true shared properties, untrained and trained, for four learning rules"></svg>
+    <p class="caption">Alignment with the true shared properties at full overlap (S = 8, width 32, 8,000 steps, mean of three seeds). Hollow circle: untrained network, shared by all rules. Filled circle: trained. The right column is the eye↔ear alignment of the same pair.</p>
+  </div>
+</section>
+
+<section aria-labelledby="drift">
+  <h2 id="drift">How much drift?</h2>
+  <p>Too little drift approaches the no-drift case; too much makes the two glimpses nearly unrelated objects. The prediction, written into the script before it ran, was an inverted U. It held in every seed, and the <em class="ear">ear</em> depended on drift more than the <em class="eye">eye</em> in relative terms (3.3× against 1.75×).</p>
+  <div class="figure">
+    <div class="controls">
+      <div class="seg" id="d-seg" role="group" aria-label="Measure"></div>
+    </div>
+    <svg id="driftfig" viewBox="0 0 720 300" role="img" aria-label="Alignment against drift between glimpses"></svg>
+    <div class="readout" id="d-read" aria-live="polite"></div>
+    <p class="caption">S = 8, width 32, 8,000 steps, mean ± SD over three seeds. σ = 0 is <code>contrast_fresh</code>; the shaded column is σ = 0.05, the value used in the main experiments. Tripling training at σ = 0.05 raises calibrated eye↔ear alignment only from 0.070 to 0.086.</p>
+  </div>
+</section>
+
+<section aria-labelledby="unpaired">
+  <h2 id="unpaired">Detectable is not usable</h2>
+  <p>If the two representations share neighborhoods, it might be possible to recover which image goes with which sound without any pairs. We gave each learner's embeddings, pairing discarded, to Gromov–Wasserstein matching. It stayed at chance for every drift and seed. Running the same matcher on the true latents against noisy copies of themselves shows why: it needs far more agreement than the learners have.</p>
+  <div class="figure">
+    <svg id="unpfig" viewBox="0 0 720 320" role="img" aria-label="Unpaired match quality against paired alignment"></svg>
+    <div class="readout" id="u-read" aria-live="polite">Hover a point for its values.</div>
+    <p class="caption">Match quality is 0 for random matching and 1 for perfect. The line is the matcher's calibration on true latents plus noise (400 objects). Small dots are the 24 learner pairs (untrained and σ = 0 to 0.4, three seeds each, 1,024 objects), all near zero. The calibration used fewer objects, so the comparison is approximate.</p>
+  </div>
+</section>
+
+<section aria-labelledby="scale">
+  <h2 id="scale">Fine agreement fades as the evaluation grows; coarse agreement holds</h2>
+  <p>Koepke et al. (2026) report that language–vision alignment falls as evaluation sets grow while coarse category agreement survives. Partially shared perception produces the same pattern. With more objects, each object's nearest neighbors are decided by finer differences, and private properties, which the other sense cannot see, decide more of them. Measured at a fixed fraction of the data instead of a fixed 10 neighbors, agreement stays flat.</p>
+  <div class="figure">
+    <div class="controls">
+      <div class="seg" id="sc-who" role="group" aria-label="Learners"></div>
+      <div class="seg" id="sc-k" role="group" aria-label="Neighborhood size"></div>
+    </div>
+    <svg id="scalefig" viewBox="0 0 720 300" role="img" aria-label="Alignment against the number of evaluated objects"></svg>
+    <div class="readout" id="sc-read" aria-live="polite"></div>
+    <p class="caption">Trained learners: calibrated eye↔ear alignment (contrast_drift, σ = 0.05, three seeds, 10-permutation null). Perfect learners: raw alignment between the two senses' true latent vectors, the score a learner with no error would reach (three draws). With k = N/100 at N = 256, only 3 neighbors are used and the estimate is noisy.</p>
+  </div>
+</section>
+
+<section aria-labelledby="tv">
+  <h2 id="tv">A sanity check with language and vision models</h2>
+  <p>On the 1,024 image–caption pairs from the original study, calibrated alignment between Pythia and DINOv2 still rises with language-model size, so the reported trend is not an artifact of the layer search. This regime is known to overstate convergence and shares human data on both sides, so it is a pipeline check, not evidence about scale.</p>
+  <div class="figure">
+    <svg id="tvfig" viewBox="0 0 720 280" role="img" aria-label="Calibrated text-vision alignment against Pythia size"></svg>
+    <p class="caption">Mutual 10-NN alignment, maximized over layer pairs and calibrated against 20 permutations that repeat the full layer search. Every cell beat all 20 permutations. Cross: randomly initialized Pythia-410M, whose best layer is always the token embedding.</p>
+  </div>
+</section>
+
+<section aria-labelledby="predictions">
+  <h2 id="predictions">Predictions and outcomes</h2>
+  <p>The core predictions follow from identifiability theory and were fixed before the multi-seed runs. The three follow-ups were designed after the main results, with predictions written into each script before it ran.</p>
+  <div class="preds" id="preds"></div>
+</section>
+
+<section aria-labelledby="reproduce">
+  <h2 id="reproduce">Code &amp; data</h2>
+  <p>Everything behind the paper and this page is in this repository. A synthetic configuration takes about two minutes per 8,000 steps on one RTX 4070 Ti.</p>
+<pre class="files">code/synthetic_world.py        world, learners, metric
+code/synthetic_robustness.py   overlap, learning-rule and width sweeps
+code/drift_sweep.py            drift sweep and 24k-step runs
+code/unpaired_alignment.py     Gromov–Wasserstein matching (--calibrate)
+code/scale_eval.py             trained learners at N = 256 to 8,192
+code/perfect_learner_scale.py  perfect-learner reference levels
+code/platonic_test.py          Pythia × DINOv2 check with calibration
+code/make_figures_v2.py        paper figures and summary numbers
+data/*.csv                     raw results, three seeds per configuration
+paper/                         LaTeX source, figures and PDF
+
+pip install -r requirements.txt
+cd code
+python synthetic_robustness.py
+python drift_sweep.py
+python make_figures_v2.py ../data ../paper/figures</pre>
+  <p class="note">Limitations: a toy world with 8 independent uniform latents per sense; networks of a few million parameters; three seeds; one neighborhood metric and one matching method; most results at 1,024 objects with one image and one sound each. The results show that a shared world can produce convergence without shared data, not how much of the convergence between web-trained models it explains.</p>
+</section>
+
+<section aria-labelledby="citation" class="cite">
+  <h2 id="citation">Citation</h2>
+  <div style="position:relative">
+<pre id="bibtex">@misc{bussing2026senses,
+  title  = {Separately Trained Senses Converge on Shared Latent
+            Structure: An Empirical Check of Identifiability
+            Predictions Without Shared Data},
+  author = {Bussing, Jonathan},
+  year   = {2026},
+  note   = {Preprint}
+}</pre>
+    <button class="btn" type="button" id="copy-bib">Copy</button>
+  </div>
+</section>
+
+<footer>
+  Builds on Huh et al. (2024), The Platonic Representation Hypothesis; Zimmermann et al. (2021); von Kügelgen et al. (2021); Daunhawer et al. (2023); Koepke et al. (2026); Gröger et al. (2026). Language–vision data: WIT image–caption pairs released by Huh et al.; models Pythia (Biderman et al., 2023) and DINOv2 (Oquab et al., 2024). Text and figures CC BY 4.0; code MIT.
+</footer>
+
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(function(){
+const D = {"curves":{"0":[-0.0002,-0.0007,-0.0008],"2":[0.0024,0.0034,0.0041],"4":[0.0017,0.0087,0.0105],"6":[0.0054,0.0186,0.0238],"8":[0.0105,0.0591,0.0697]},"drift":[[0,0.0173,0.0026,0.2035,0.0098,0.0501,0.0051],[0.01,0.0298,0.0036,0.2086,0.0054,0.0756,0.0053],[0.02,0.0426,0.0025,0.2276,0.006,0.0981,0.0069],[0.05,0.0697,0.0044,0.2819,0.0066,0.1337,0.0153],[0.1,0.1005,0.0068,0.3497,0.0103,0.1574,0.0162],[0.2,0.1076,0.0045,0.3552,0.0107,0.1631,0.011],[0.4,0.0891,0.0035,0.3264,0.0075,0.1485,0.0132]],"scale":{"fixed10_8":[[256,0.0698,0.0074],[1024,0.0688,0.0075],[4096,0.0579,0.0037],[8192,0.0547,0.0021]],"fixed10_6":[[256,0.0327,0.0044],[1024,0.0248,0.0039],[4096,0.0178,0.0008],[8192,0.0144,0.001]],"fixed10_4":[[256,0.0143,0.005],[1024,0.0105,0.0011],[4096,0.0061,0.0011],[8192,0.0046,0.0004]],"frac1pct_8":[[256,0.0504,0.0156],[1024,0.0688,0.0075],[4096,0.0696,0.0029],[8192,0.0701,0.0024]],"frac1pct_6":[[256,0.023,0.0049],[1024,0.0248,0.0039],[4096,0.0277,0.0012],[8192,0.028,0.001]],"frac1pct_4":[[256,0.0057,0.0031],[1024,0.0105,0.0011],[4096,0.0121,0.0012],[8192,0.0124,0.0013]]},"perfect":{"fixed10_8":[[256,1.0],[1024,1.0],[4096,1.0],[8192,1.0]],"fixed10_7":[[256,0.551],[1024,0.449],[4096,0.374],[8192,0.338]],"fixed10_6":[[256,0.367],[1024,0.259],[4096,0.175],[8192,0.144]],"fixed10_4":[[256,0.175],[1024,0.082],[4096,0.041],[8192,0.028]],"frac1pct_8":[[256,1.0],[1024,1.0],[4096,1.0],[8192,1.0]],"frac1pct_7":[[256,0.442],[1024,0.449],[4096,0.468],[8192,0.467]],"frac1pct_6":[[256,0.238],[1024,0.259],[4096,0.261],[8192,0.261]],"frac1pct_4":[[256,0.094],[1024,0.082],[4096,0.087],[8192,0.088]]},"unpaired":[[0.0,"u",0.0214,0.004],[0.0,"t",0.0287,0.0032],[0.01,"t",0.0446,0.0025],[0.02,"t",0.0561,-0.0039],[0.05,"t",0.081,-0.0176],[0.1,"t",0.1124,-0.0168],[0.2,"t",0.124,-0.0073],[0.4,"t",0.0966,0.0508],[0.0,"u",0.0186,0.0092],[0.0,"t",0.0264,0.0093],[0.01,"t",0.0398,-0.0011],[0.02,"t",0.0508,-0.0064],[0.05,"t",0.075,0.0077],[0.1,"t",0.1038,0.0241],[0.2,"t",0.1143,-0.06],[0.4,"t",0.1,0.0004],[0.0,"u",0.0254,-0.0003],[0.0,"t",0.0299,-0.0019],[0.01,"t",0.0388,0.0019],[0.02,"t",0.0534,-0.0019],[0.05,"t",0.0844,-0.0072],[0.1,"t",0.1164,-0.0105],[0.2,"t",0.1175,-0.004],[0.4,"t",0.1046,-0.0575]]}
+;
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; };
+const $ = id => document.getElementById(id);
+const clear = s => { while (s.firstChild) s.removeChild(s.firstChild); };
+const f3 = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(3);
+const width = s => Math.max(340, Math.min(720, s.clientWidth || 720));
+const tip = $('tip');
+function hover(node, text, onEnter){
+  node.style.cursor = 'default';
+  node.addEventListener('pointerenter', () => { tip.textContent = text; tip.hidden = false; if (onEnter) onEnter(); });
+  node.addEventListener('pointermove', e => { const w = tip.offsetWidth; tip.style.left = Math.min(e.clientX + 12, innerWidth - w - 8) + 'px'; tip.style.top = (e.clientY - 34) + 'px'; });
+  node.addEventListener('pointerleave', () => { tip.hidden = true; });
+}
+function segment(host, items, get, set){
+  const h = $(host);
+  items.forEach(([v, lab]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = lab; b.dataset.v = v;
+    b.addEventListener('click', () => { set(v); sync(); }); h.appendChild(b); });
+  function sync(){ [...h.querySelectorAll('button')].forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v) === String(get()) ? 'true' : 'false')); }
+  sync(); return sync;
+}
+function grid(svg, L, R, T, B, y, ticks, fmt){
+  ticks.forEach(t => { el('line', {x1:L, x2:R, y1:y(t), y2:y(t), stroke:'var(--rule)', 'stroke-width':1}, svg);
+    el('text', {x:L - 8, y:y(t) + 4, 'text-anchor':'end', 'font-size':12, fill:'var(--muted)'}, svg, fmt(t)); });
+}
+const redraws = [];
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => redraws.forEach(f => f()), 120); });
+
+/* ---------- Overlap explorer ---------- */
+const OV = {
+  0:{m:-0.001, sd:0.001, raw:0.011, perf:0.010, eye:null, ear:null, p:'p ≥ 0.71'},
+  2:{m:0.004, sd:0.001, raw:0.015, perf:0.030, eye:[0.017,0.021], ear:[0.014,0.015], p:'p = 0.048'},
+  4:{m:0.010, sd:0.002, raw:0.022, perf:0.082, eye:[0.035,0.064], ear:[0.024,0.044], p:'p = 0.048'},
+  6:{m:0.024, sd:0.002, raw:0.035, perf:0.259, eye:[0.070,0.145], ear:[0.035,0.081], p:'p = 0.048'},
+  8:{m:0.070, sd:0.004, raw:0.080, perf:1.000, eye:[0.121,0.282], ear:[0.053,0.134], p:'p = 0.048'}
+};
+let S = 8;
+const syncS = segment('s-seg', [0,2,4,6,8].map(v => [v, v + ' of 8']), () => S, v => { S = +v; drawOverlap(); });
+function drawProps(){
+  const svg = $('props'); clear(svg); const W = width(svg), sm = W < 520; svg.setAttribute('viewBox', `0 0 ${W} 150`);
+  const L = sm ? 44 : 64, R = W - 8, cw = (R - L) / 8, sz = Math.min(cw - 8, 40), yE = 18, yA = 150 - 18 - sz;
+  el('text', {x:L - 10, y:yE + sz/2 + 5, 'text-anchor':'end', 'font-size':13, 'font-weight':600, fill:'var(--eye)'}, svg, 'Eye');
+  el('text', {x:L - 10, y:yA + sz/2 + 5, 'text-anchor':'end', 'font-size':13, 'font-weight':600, fill:'var(--ear)'}, svg, 'Ear');
+  for (let i = 0; i < 8; i++){
+    const x = L + i * cw + (cw - sz) / 2, sh = i < S;
+    if (sh) el('line', {x1:x + sz/2, x2:x + sz/2, y1:yE + sz + 3, y2:yA - 3, stroke:'var(--ink)', 'stroke-width':2}, svg);
+    [[yE,'eye'],[yA,'ear']].forEach(([y, s]) => {
+      const r = el('rect', {x, y, width:sz, height:sz, rx:5, fill: sh ? 'var(--ink)' : 'var(--surface)', stroke: sh ? 'var(--ink)' : 'var(--' + s + ')', 'stroke-width':2}, svg);
+      el('text', {x:x + sz/2, y:y + sz/2 + 4, 'text-anchor':'middle', 'font-size':sm ? 10 : 11.5, 'font-family':'var(--mono)', fill: sh ? 'var(--surface)' : 'var(--' + s + ')'}, svg, sh ? 's' + (i + 1) : 'p' + (i + 1 - S));
+      hover(r, sh ? 'shared property s' + (i + 1) : s + '-only property');
+    });
+  }
+}
+function drawCurve(){
+  const svg = $('curve'); clear(svg); const W = width(svg), sm = W < 520; svg.setAttribute('viewBox', `0 0 ${W} 250`);
+  const L = sm ? 48 : 56, R = W - (sm ? 44 : 64), T = 12, B = 208, steps = [0, 4000, 8000];
+  const x = t => L + t / 8000 * (R - L), y = v => B - (v + 0.005) / 0.09 * (B - T);
+  grid(svg, L, R, T, B, y, [0, 0.02, 0.04, 0.06, 0.08], v => v.toFixed(2));
+  steps.forEach(t => el('text', {x:x(t), y:B + 20, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, t.toLocaleString('en-US')));
+  el('text', {x:(L + R)/2, y:B + 40, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, 'Training steps');
+  el('line', {x1:L, x2:R, y1:y(0), y2:y(0), stroke:'var(--null)', 'stroke-dasharray':'5 5', 'stroke-width':1.5}, svg);
+  el('text', {x:L + 6, y:y(0) - 6, 'font-size':11, fill:'var(--muted)'}, svg, 'permutation null');
+  [0,2,4,6,8].forEach(s => {
+    const v = D.curves[s], on = s === S;
+    const pts = steps.map((t, i) => x(t) + ',' + y(v[i])).join(' ');
+    el('polyline', {points:pts, fill:'none', stroke: on ? 'var(--ink)' : 'var(--faint)', 'stroke-width': on ? 2.5 : 1.5, 'stroke-opacity': on ? 1 : .5}, svg);
+    steps.forEach((t, i) => { const c = el('circle', {cx:x(t), cy:y(v[i]), r: on ? 5 : 3.5, fill: on ? 'var(--ink)' : 'var(--faint)', stroke:'var(--surface)', 'stroke-width':2}, svg);
+      const hit = el('circle', {cx:x(t), cy:y(v[i]), r:12, fill:'transparent'}, svg); hover(hit, 'S = ' + s + ' · step ' + t + ' · ' + f3(v[i])); });
+    el('text', {x:R + 8, y:y(v[2]) + 4, 'font-size':12, 'font-weight': on ? 600 : 400, fill: on ? 'var(--ink)' : 'var(--muted)'}, svg, 'S=' + s);
+  });
+}
+function drawOverlap(){
+  syncS(); const o = OV[S];
+  $('o-m').textContent = f3(o.m) + ' ± ' + o.sd.toFixed(3);
+  $('o-perf').textContent = o.raw.toFixed(3) + ' / ' + o.perf.toFixed(3);
+  $('o-eye').textContent = o.eye ? o.eye[0].toFixed(3) + ' → ' + o.eye[1].toFixed(3) : 'n/a';
+  $('o-ear').textContent = o.ear ? o.ear[0].toFixed(3) + ' → ' + o.ear[1].toFixed(3) : 'n/a';
+  drawProps(); drawCurve();
+}
+drawOverlap(); redraws.push(drawOverlap);
+
+/* ---------- Learning rules ---------- */
+const RULES = [['recon', 0.180, 0.055, 0.028], ['contrast_fixed', 0.204, 0.050, 0.028], ['contrast_fresh', 0.203, 0.050, 0.028], ['contrast_drift', 0.282, 0.134, 0.080]];
+function drawRules(){
+  const svg = $('rulefig'); clear(svg); const W = width(svg), sm = W < 520; svg.setAttribute('viewBox', `0 0 ${W} 300`);
+  const L = sm ? 104 : 140, R = W - (sm ? 58 : 90), T = 16, B = 252, x = v => L + v / 0.3 * (R - L), rowH = (B - T) / 4;
+  [0, 0.1, 0.2, 0.3].forEach(t => { el('line', {x1:x(t), x2:x(t), y1:T, y2:B, stroke:'var(--rule)'}, svg); el('text', {x:x(t), y:B + 20, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, t.toFixed(1)); });
+  el('text', {x:(L + R)/2, y:B + 42, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, 'Alignment with the true shared properties');
+  el('text', {x:W - 6, y:T - 2, 'text-anchor':'end', 'font-size':11, fill:'var(--muted)'}, svg, 'eye↔ear');
+  RULES.forEach(([name, e, a, m], i) => {
+    const yc = T + rowH * i + rowH / 2, drift = name === 'contrast_drift';
+    if (drift) el('rect', {x:0, y:T + rowH * i + 4, width:W, height:rowH - 8, rx:6, fill:'var(--band)'}, svg);
+    el('text', {x:L - 12, y:yc + 4, 'text-anchor':'end', 'font-size':sm ? 11 : 12.5, 'font-family':'var(--mono)', 'font-weight': drift ? 600 : 400, fill:'var(--ink)'}, svg, name);
+    [['eye', 0.121, e, -9], ['ear', 0.053, a, 9]].forEach(([s, u, t, dy]) => {
+      const yy = yc + dy;
+      el('line', {x1:x(u), x2:x(t), y1:yy, y2:yy, stroke:'var(--' + s + ')', 'stroke-width':2.5, 'stroke-opacity':.5}, svg);
+      el('circle', {cx:x(u), cy:yy, r:5, fill:'var(--surface)', stroke:'var(--' + s + ')', 'stroke-width':2}, svg);
+      el('circle', {cx:x(t), cy:yy, r:6, fill:'var(--' + s + ')', stroke:'var(--surface)', 'stroke-width':2}, svg);
+      const hit = el('rect', {x:x(Math.min(u, t)) - 10, y:yy - 8, width:Math.abs(x(t) - x(u)) + 20, height:16, fill:'transparent'}, svg);
+      hover(hit, name + ' · ' + s + '↔truth ' + u.toFixed(3) + ' → ' + t.toFixed(3));
+      if (i === 0) el('text', {x:x(t) + 12, y:yy + 4, 'font-size':11.5, 'font-weight':600, fill:'var(--' + s + ')'}, svg, s === 'eye' ? 'Eye' : 'Ear');
+    });
+    el('text', {x:W - 6, y:yc + 5, 'text-anchor':'end', 'font-size':13, 'font-family':'var(--mono)', 'font-weight': drift ? 600 : 400, fill:'var(--ink)'}, svg, m.toFixed(3));
+  });
+}
+drawRules(); redraws.push(drawRules);
+
+/* ---------- Drift ---------- */
+let DM = 'm';
+const DMS = {m:['Eye↔ear', 1, 'ink', 'Calibrated eye↔ear alignment', 0.12], eye:['Eye↔truth', 3, 'eye', 'Eye alignment with the truth', 0.4], ear:['Ear↔truth', 5, 'ear', 'Ear alignment with the truth', 0.4]};
+const syncD = segment('d-seg', Object.entries(DMS).map(([k, v]) => [k, v[0]]), () => DM, v => { DM = v; drawDrift(); });
+function drawDrift(){
+  syncD(); const svg = $('driftfig'); clear(svg); const W = width(svg), sm = W < 520; svg.setAttribute('viewBox', `0 0 ${W} 300`);
+  const [lab, col, c, axis, top] = DMS[DM], L = sm ? 48 : 58, R = W - 14, T = 14, B = 250, n = D.drift.length;
+  const x = i => L + (i + .5) / n * (R - L), y = v => B - v / top * (B - T), color = 'var(--' + c + ')';
+  const ticks = top > 0.2 ? [0, 0.1, 0.2, 0.3, 0.4] : [0, 0.03, 0.06, 0.09, 0.12];
+  el('rect', {x:x(3) - (R - L) / n / 2, y:T, width:(R - L) / n, height:B - T, fill:'var(--band)'}, svg);
+  grid(svg, L, R, T, B, y, ticks, v => v.toFixed(2));
+  D.drift.forEach((r, i) => el('text', {x:x(i), y:B + 20, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, r[0] === 0 ? '0' : String(r[0])));
+  el('text', {x:(L + R)/2, y:B + 42, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, 'Drift σ between the two glimpses');
+  el('text', {x:L + 4, y:T + 12, 'font-size':12, fill:'var(--muted)'}, svg, axis);
+  el('polyline', {points:D.drift.map((r, i) => x(i) + ',' + y(r[col])).join(' '), fill:'none', stroke:color, 'stroke-width':2.5}, svg);
+  let best = 0; D.drift.forEach((r, i) => { if (r[col] > D.drift[best][col]) best = i; });
+  D.drift.forEach((r, i) => {
+    const v = r[col], sd = r[col + 1];
+    el('line', {x1:x(i), x2:x(i), y1:y(v - sd), y2:y(v + sd), stroke:color, 'stroke-width':1.5, 'stroke-opacity':.6}, svg);
+    el('circle', {cx:x(i), cy:y(v), r: i === best ? 7 : 5.5, fill:color, stroke:'var(--surface)', 'stroke-width':2}, svg);
+    if (i === best || i === 0) el('text', {x:x(i), y:y(v + sd) - 9, 'text-anchor':'middle', 'font-size':12, 'font-weight':600, fill:'var(--ink)'}, svg, v.toFixed(3));
+    const hit = el('rect', {x:x(i) - (R - L) / n / 2, y:T, width:(R - L) / n, height:B - T, fill:'transparent'}, svg);
+    hover(hit, 'σ = ' + r[0] + ' · ' + lab + ' ' + v.toFixed(3) + ' ± ' + sd.toFixed(3));
+  });
+  const a = D.drift[0][col], b = D.drift[best][col];
+  $('d-read').textContent = lab + ': ' + a.toFixed(3) + ' without drift → ' + b.toFixed(3) + ' at σ = ' + D.drift[best][0] + ' (peak)';
+}
+drawDrift(); redraws.push(drawDrift);
+
+/* ---------- Unpaired ---------- */
+const CAL = [[0.05,0.7315,1.0],[0.08,0.6037,0.9905],[0.10,0.5250,0.9781],[0.12,0.4455,0.8927],[0.15,0.3630,0.4207],[0.20,0.2580,0.1486]];
+function drawUnp(){
+  const svg = $('unpfig'); clear(svg); const W = width(svg), sm = W < 520; svg.setAttribute('viewBox', `0 0 ${W} 320`);
+  const L = sm ? 44 : 54, R = W - 14, T = 14, B = 270, x = v => L + v / 0.8 * (R - L), y = v => B - (v + 0.1) / 1.1 * (B - T);
+  el('rect', {x:x(0.02), y:T, width:x(0.12) - x(0.02), height:B - T, fill:'var(--band)'}, svg);
+  el('text', {x:x(0.12) + 6, y:T + 14, 'font-size':12, fill:'var(--eye)', 'font-weight':600}, svg, sm ? 'learners' : 'where the learners are');
+  grid(svg, L, R, T, B, y, [0, 0.25, 0.5, 0.75, 1], v => v.toFixed(2));
+  [0, 0.2, 0.4, 0.6, 0.8].forEach(t => el('text', {x:x(t), y:B + 20, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, t.toFixed(1)));
+  el('text', {x:(L + R)/2, y:B + 42, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, 'Paired alignment M (what ordinary evaluation measures)');
+  el('text', {x:L + 4, y:y(1) - 6, 'font-size':12, fill:'var(--muted)'}, svg, 'Unpaired match quality');
+  el('polyline', {points:CAL.slice().reverse().map(c => x(c[1]) + ',' + y(c[2])).join(' '), fill:'none', stroke:'var(--ink)', 'stroke-width':2}, svg);
+  CAL.forEach(c => { el('circle', {cx:x(c[1]), cy:y(c[2]), r:6, fill:'var(--ink)', stroke:'var(--surface)', 'stroke-width':2}, svg);
+    const hit = el('circle', {cx:x(c[1]), cy:y(c[2]), r:13, fill:'transparent'}, svg);
+    hover(hit, 'true latents + noise ' + c[0] + ' · paired ' + c[1].toFixed(2) + ' · quality ' + c[2].toFixed(2), () => $('u-read').textContent = 'Calibration, noise SD ' + c[0] + ': paired alignment ' + c[1].toFixed(2) + ', match quality ' + c[2].toFixed(2)); });
+  el('text', {x:x(0.4455) + 12, y:y(0.8927) + 16, 'font-size':12, fill:'var(--ink)'}, svg, 'matcher calibration');
+  D.unpaired.forEach(([sg, st, m, q]) => { const c = el('circle', {cx:x(m), cy:y(q), r:3.5, fill: st === 'u' ? 'var(--surface)' : 'var(--eye)', stroke:'var(--eye)', 'stroke-width':1.5}, svg);
+    const hit = el('circle', {cx:x(m), cy:y(q), r:8, fill:'transparent'}, svg);
+    const t = (st === 'u' ? 'untrained' : 'σ = ' + sg) + ' · paired ' + m.toFixed(3) + ' · quality ' + f3(q);
+    hover(hit, t, () => $('u-read').textContent = 'Learner pair, ' + t); });
+  el('line', {x1:L, x2:R, y1:y(0), y2:y(0), stroke:'var(--null)', 'stroke-dasharray':'5 5', 'stroke-width':1.5}, svg);
+  el('text', {x:R - 4, y:y(0) + 16, 'text-anchor':'end', 'font-size':11, fill:'var(--muted)'}, svg, 'random matching');
+}
+drawUnp(); redraws.push(drawUnp);
+
+/* ---------- Scale ---------- */
+let WHO = 'trained', KM = 'fixed10';
+const syncW = segment('sc-who', [['trained','Trained learners'],['perfect','Perfect learners']], () => WHO, v => { WHO = v; drawScale(); });
+const syncK = segment('sc-k', [['fixed10','Fine: k = 10'],['frac1pct','Coarse: k = N/100']], () => KM, v => { KM = v; drawScale(); });
+function drawScale(){
+  syncW(); syncK(); const svg = $('scalefig'); clear(svg); const W = width(svg), sm = W < 520; svg.setAttribute('viewBox', `0 0 ${W} 300`);
+  const L = sm ? 48 : 58, R = W - (sm ? 44 : 60), T = 14, B = 250, Ns = [256, 1024, 4096, 8192];
+  const x = N => L + (Math.log2(N) - 8) / 5 * (R - L);
+  const perfect = WHO === 'perfect', top = perfect ? 1 : 0.08, y = v => B - v / top * (B - T);
+  const ticks = perfect ? [0, 0.25, 0.5, 0.75, 1] : [0, 0.02, 0.04, 0.06, 0.08];
+  grid(svg, L, R, T, B, y, ticks, v => v.toFixed(2));
+  Ns.forEach(N => el('text', {x:x(N), y:B + 20, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, N.toLocaleString('en-US')));
+  el('text', {x:(L + R)/2, y:B + 42, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, 'Objects in the evaluation set, N (log scale)');
+  el('text', {x:L + 4, y:T + 12, 'font-size':12, fill:'var(--muted)'}, svg, perfect ? 'Raw alignment of true latents' : 'Calibrated eye↔ear alignment');
+  const Ss = perfect ? [8, 7, 6, 4] : [8, 6, 4], parts = [];
+  Ss.forEach(s => {
+    const rows = perfect ? D.perfect[KM + '_' + s].map(r => [r[0], r[1], 0]) : D.scale[KM + '_' + s], c = 'var(--s' + s + ')';
+    el('polyline', {points:rows.map(r => x(r[0]) + ',' + y(r[1])).join(' '), fill:'none', stroke:c, 'stroke-width':2.5}, svg);
+    rows.forEach(r => { if (r[2]) el('line', {x1:x(r[0]), x2:x(r[0]), y1:y(r[1] - r[2]), y2:y(r[1] + r[2]), stroke:c, 'stroke-width':1.5, 'stroke-opacity':.6}, svg);
+      el('circle', {cx:x(r[0]), cy:y(r[1]), r:5, fill:c, stroke:'var(--surface)', 'stroke-width':2}, svg);
+      const hit = el('circle', {cx:x(r[0]), cy:y(r[1]), r:12, fill:'transparent'}, svg);
+      hover(hit, 'S = ' + s + ' · N = ' + r[0] + ' · ' + r[1].toFixed(3) + (r[2] ? ' ± ' + r[2].toFixed(3) : '')); });
+    const last = rows[rows.length - 1];
+    el('text', {x:R + 8, y:y(last[1]) + 4, 'font-size':12, 'font-weight':600, fill:'var(--ink)'}, svg, 'S=' + s);
+    const first = KM === 'fixed10' ? rows[0][1] : rows[1][1];
+    parts.push('S=' + s + ' ' + first.toFixed(3) + '→' + last[1].toFixed(3));
+  });
+  $('sc-read').textContent = (KM === 'fixed10' ? 'N = 256 → 8,192: ' : 'N = 1,024 → 8,192: ') + parts.join(' · ');
+}
+drawScale(); redraws.push(drawScale);
+
+/* ---------- Text-vision ---------- */
+const TV = {params:[45,124,354,909,1312,2646], names:['70M','160M','410M','1B','1.4B','2.8B'],
+  S:[0.039,0.045,0.052,0.062,0.062,0.074], B:[0.039,0.045,0.054,0.064,0.064,0.074], L:[0.038,0.046,0.058,0.067,0.065,0.079], rand:[0.022,0.021,0.022]};
+function drawTV(){
+  const svg = $('tvfig'); clear(svg); const W = width(svg), sm = W < 520; svg.setAttribute('viewBox', `0 0 ${W} 280`);
+  const L = sm ? 48 : 58, R = W - (sm ? 56 : 90), T = 14, B = 228, lx = v => Math.log10(v);
+  const x = p => L + (lx(p) - lx(40)) / (lx(3000) - lx(40)) * (R - L), y = v => B - v / 0.09 * (B - T);
+  grid(svg, L, R, T, B, y, [0, 0.03, 0.06, 0.09], v => v.toFixed(2));
+  TV.params.forEach((p, i) => { if (sm && i === 4) return; el('text', {x:x(p), y:B + 20, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, TV.names[i]); });
+  el('text', {x:(L + R)/2, y:B + 42, 'text-anchor':'middle', 'font-size':12, fill:'var(--muted)'}, svg, 'Pythia language model (parameters, log scale)');
+  el('text', {x:L + 4, y:T + 12, 'font-size':12, fill:'var(--muted)'}, svg, 'Calibrated alignment with DINOv2');
+  [['S','s4','DINOv2-S'],['B','s6','DINOv2-B'],['L','s8','DINOv2-L']].forEach(([k, c, name]) => {
+    el('polyline', {points:TV.params.map((p, i) => x(p) + ',' + y(TV[k][i])).join(' '), fill:'none', stroke:'var(--' + c + ')', 'stroke-width':2.5}, svg);
+    TV.params.forEach((p, i) => { el('circle', {cx:x(p), cy:y(TV[k][i]), r:4.5, fill:'var(--' + c + ')', stroke:'var(--surface)', 'stroke-width':2}, svg);
+      const hit = el('circle', {cx:x(p), cy:y(TV[k][i]), r:10, fill:'transparent'}, svg); hover(hit, 'Pythia-' + TV.names[i] + ' × ' + name + ' · ' + TV[k][i].toFixed(3)); });
+    const off = k === 'S' ? 16 : k === 'B' ? 3 : -6;
+    el('text', {x:R + 8, y:y(TV[k][5]) + 4 + off, 'font-size':12, 'font-weight':600, fill:'var(--ink)'}, svg, sm ? k : name);
+  });
+  const cx = x(354), cy = y(0.0217), s = 6;
+  const g = el('g', {}, svg);
+  el('line', {x1:cx - s, x2:cx + s, y1:cy - s, y2:cy + s, stroke:'var(--ink)', 'stroke-width':2}, g);
+  el('line', {x1:cx - s, x2:cx + s, y1:cy + s, y2:cy - s, stroke:'var(--ink)', 'stroke-width':2}, g);
+  el('text', {x:cx + 12, y:cy + 4, 'font-size':12, fill:'var(--muted)'}, svg, 'untrained 410M');
+  hover(el('circle', {cx, cy, r:12, fill:'transparent'}, svg), 'Pythia-410M, random init · 0.021–0.022');
+}
+drawTV(); redraws.push(drawTV);
+
+/* ---------- Predictions ---------- */
+const P = [
+  ['Core predictions from theory', [
+    ['P0','With nothing shared, alignment equals the permutation null.','Supported','good'],
+    ['P1','With drift, alignment and truth-recovery rise with training and with overlap.','Supported','good'],
+    ['P2','Without drift, no guarantee that neighborhoods are recovered. The eye partly recovers them anyway; the ear does not.','Consistent','mixed'],
+    ['P3','Reconstruction carries no guarantee of convergence.','Consistent','mixed']]],
+  ['Drift sweep', [
+    ['(i)','Convergence follows an inverted U in σ.','Supported','good'],
+    ['(ii)','The ear depends on drift more than the eye.','Relative only','mixed'],
+    ['(iii)','Tripling training closes some, but not most, of the gap.','Supported','good']]],
+  ['Unpaired matching', [
+    ['(1)','Match quality follows the drift inverted U.','Not supported','miss'],
+    ['(2)','Untrained and σ = 0 networks match at chance.','Supported','good'],
+    ['(3)','A null result is possible because the matcher needs nearly faithful geometry.','Supported','good']]],
+  ['Evaluation size', [
+    ['(1)','With k = 10, alignment falls with N at every overlap, including full overlap.','Supported','good'],
+    ['(2)','With k = N/100, alignment is roughly constant.','Supported','good'],
+    ['(3)','Learned curves fall in proportion to perfect-learner curves.','S = 6 only','mixed']]]
+];
+const host = $('preds');
+P.forEach(([title, rows]) => {
+  const g = document.createElement('div'); g.className = 'pgroup';
+  g.innerHTML = '<h3>' + title + '</h3>' + rows.map(([id, t, v, tone]) => '<div class="pred"><span class="id">' + id + '</span><p>' + t + '</p><span class="verdict" data-tone="' + tone + '">' + v + '</span></div>').join('');
+  host.appendChild(g);
+});
+
+/* ---------- Copy BibTeX ---------- */
+const copyBtn = $('copy-bib'), bib = $('bibtex');
+copyBtn.addEventListener('click', () => {
+  const done = () => { copyBtn.textContent = 'Copied'; setTimeout(() => copyBtn.textContent = 'Copy', 1600); };
+  const fallback = () => { const s = getSelection(), r = document.createRange(); r.selectNodeContents(bib); s.removeAllRanges(); s.addRange(r); copyBtn.textContent = 'Selected'; };
+  try { navigator.clipboard.writeText(bib.textContent).then(done, fallback); } catch (e) { fallback(); }
+});
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite the preprint."
+title: "Separately Trained Senses Converge on Shared Latent Structure: An Empirical Check of Identifiability Predictions Without Shared Data"
+type: software
+authors:
+  - family-names: Bussing
+    given-names: Jonathan
+    email: jbussing@ucsd.edu
+version: "1.0.0"
+date-released: 2026-09-30
+license: MIT
+keywords:
+  - representational convergence
+  - Platonic Representation Hypothesis
+  - identifiability
+  - contrastive learning
+  - representation alignment
+preferred-citation:
+  type: article
+  title: "Separately Trained Senses Converge on Shared Latent Structure: An Empirical Check of Identifiability Predictions Without Shared Data"
+  authors:
+    - family-names: Bussing
+      given-names: Jonathan
+  year: 2026
+  publisher:
+    name: Zenodo
+  notes: "Preprint, version 1"
